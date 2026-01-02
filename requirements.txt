@@ -1,0 +1,5 @@
+numpy        # for Gilbert-Elliot model and probability calculations
+pandas       # to store and analyze simulation results (CSV)
+matplotlib   # for 3D surface and heatmap plots
+seaborn      # for prettier heatmaps on top of matplotlib (optional but recommended)
+tqdm         # to show a progress bar while running 360 simulations (life-saver)
