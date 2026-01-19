@@ -1,6 +1,3 @@
-
-
-```markdown
 # Cross-Layer Performance Optimization of a Custom ARQ Protocol
 **BLG 337E: Principles of Computer Communication - Assignment 2**
 
