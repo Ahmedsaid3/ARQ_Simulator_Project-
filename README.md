@@ -1,10 +1,4 @@
-Harika bir proje ortaya çıkardın, bunu GitHub'da sunarken profesyonel ve anlaşılır bir README dosyası projenin kalitesini doğrudan yansıtır.
 
-Senin için **BLG 337E** standartlarına uygun, hem teknik detayları içeren hem de "nasıl çalıştırılır" kısmını adım adım anlatan bir `README.md` hazırladım.
-
-Bunu kopyalayıp projenin ana dizinine `README.md` ismiyle kaydetmen yeterli.
-
----
 
 ```markdown
 # Cross-Layer Performance Optimization of a Custom ARQ Protocol
