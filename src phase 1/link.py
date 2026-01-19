@@ -37,45 +37,6 @@ class LinkLayer:
         # To connect two link layers (Sender <-> Receiver)
         self.peer_receive_callback = None
 
-        # YENİ EKLENEN: RTT Hesaplama için Değişkenler
-        self.srtt = None          # Smoothed Round Trip Time
-        self.rttvar = None        # RTT Variation
-        self.min_rto = 0.05       # Minimum Timeout (50ms) - prevents premature timeouts on fast LANs
-        self.current_rto = 1.0    # Initial conservative timeout before first measurement
-
-
-    # In src/link.py -> Add new method
-
-    def _update_rto(self, rtt_sample):
-        """
-        Implements Jacobson/Karels Algorithm to update Retransmission Timeout (RTO).
-        """
-        # Alpha (0.125) and Beta (0.25) are standard TCP constants
-        alpha = 0.125
-        beta = 0.25
-
-        if self.srtt is None:
-            # First measurement ever
-            self.srtt = rtt_sample
-            self.rttvar = rtt_sample / 2
-        else:
-            # Subsequent measurements
-            # 1. Update Variation (how unstable is the RTT?)
-            self.rttvar = (1 - beta) * self.rttvar + beta * abs(self.srtt - rtt_sample)
-            
-            # 2. Update Smoothed Average
-            self.srtt = (1 - alpha) * self.srtt + alpha * rtt_sample
-
-        # 3. Calculate RTO
-        # RTO = Average + 4 * Deviation (Safety Margin)
-        self.current_rto = self.srtt + 4 * self.rttvar
-
-        # 4. Clamp RTO to safe limits
-        # Ensure it never drops below min_rto (e.g., 50ms)
-        self.current_rto = max(self.current_rto, self.min_rto)
-
-
-
     def set_peer_callback(self, callback_func):
         """
         Sets the function to call on the 'other side' when a packet arrives.
@@ -138,7 +99,7 @@ class LinkLayer:
             self.event_manager.cancel_event(self.timers[seq_num])
             
         event = self.event_manager.schedule(
-            self.current_rto,  # <--- CHANGED FROM self.timeout_interval
+            self.timeout_interval, 
             self._handle_timeout, 
             args=(seq_num,)
         )
@@ -171,25 +132,6 @@ class LinkLayer:
             rtt = arrival_time - send_time
             self.rtt_samples.append(rtt)
             
-            # --- KARN'S ALGORITHM CHECK ---
-            # Only calculate RTT if the frame was NOT retransmitted
-            # You need to check the retry_count of the frame in sent_frames
-            is_retransmitted = False
-            if ack_seq_num in self.sent_frames:
-                if self.sent_frames[ack_seq_num].retry_count > 0:
-                    is_retransmitted = True
-            
-            # If it's a clean "first try" ACK, update RTO
-            if not is_retransmitted:
-                current_time = self.event_manager.current_time
-                rtt_sample = current_time - send_time
-                
-                # Update the adaptive timeout
-                self._update_rto(rtt_sample)
-                
-                # (Optional) Save for stats
-                self.rtt_samples.append(rtt_sample)
-
             # Kaydı sil (tekrar hesaplamamak için)
             del self.send_times[ack_seq_num]
 
