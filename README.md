@@ -101,6 +101,4 @@ The project compares two phases:
 
 This project is developed for educational purposes within the scope of BLG 337E course.
 
-```
 
-*(Bunu yaparken venv aktif olsun, yoksa bilgisayarındaki gereksiz her şeyi listeye ekler. Sadece `matplotlib`, `pandas`, `numpy` eklesen de yeter elle.)*
